@@ -18,15 +18,16 @@ public class Vcapenv {
 	}
 
 	public Vcapenv get(String key) {
-		this.current_node = (JsonNode) this.current_node.get(key);
+		this.current_node = this.current_node.get(key);
 		return this;
 	}
 
 	public Vcapenv get(Integer index) {
-		this.current_node = (JsonNode) this.current_node.get(index);
+		this.current_node = this.current_node.get(index);
 		return this;
 	}
 
+	@Override
 	public String toString() {
 		return this.current_node.toString().replace("\"", "");
 	}
