@@ -2,6 +2,10 @@ package com.rueckert.customer.email.receiver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -17,19 +21,19 @@ import com.sendgrid.SendGridException;
 @Component
 public class CustomerEmailMessageListener {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	private RestTemplate restTemplate;
-	
+
 	public CustomerEmailMessageListener() {
 		this.restTemplate = new RestTemplate();
 	}
 
-	@RabbitListener(queues = CloudConfig.CUSTOMER_QUEUE_NAME)
+	@RabbitListener(bindings = @QueueBinding(value = @Queue(value = CloudConfig.CUSTOMER_QUEUE_NAME, durable = "true"), exchange = @Exchange(value = CloudConfig.CUSTOMER_TOPIC_NAME, durable = "true", autoDelete = "false", type = ExchangeTypes.FANOUT, ignoreDeclarationExceptions = "true")))
 	public void generateEmail(String id) {
 		logger.info("Received <" + id + ">");
-		
+
 		Customer customer = restTemplate.getForObject("http://customer-api.cfapps.io/customer/{id}", Customer.class, id);
-		
+
 		Vcapenv vcapenv = new Vcapenv();
 		String sendgrid_username = vcapenv.SENDGRID_USERNAME();
 		String sendgrid_password = vcapenv.SENDGRID_PASSWORD();
