@@ -32,7 +32,14 @@ public class CustomerEmailMessageListener {
 	public void generateEmail(String id) {
 		logger.info("Received <" + id + ">");
 
-		Customer customer = restTemplate.getForObject("http://customer-api.cfapps.io/customer/{id}", Customer.class, id);
+		String customerApiUrl = System.getenv("customer_api_url");
+		logger.info(String.format("Customer API URL {%s}.", customerApiUrl));
+		
+		if (customerApiUrl == null) {
+			customerApiUrl = "http://customer-api.cfapps.io";
+		}
+		
+		Customer customer = restTemplate.getForObject(customerApiUrl + "/customer/{id}", Customer.class, id);
 
 		Vcapenv vcapenv = new Vcapenv();
 		String sendgrid_username = vcapenv.SENDGRID_USERNAME();
