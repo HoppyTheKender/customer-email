@@ -1,0 +1,9 @@
+---
+applications:
+- name: customer-email
+  memory: 512M
+  disk_quota: 512M
+  instances: 1
+  services:
+    - customer-rabbit-mq
+    - customer-email-send-grid
